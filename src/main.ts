@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './common/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,8 @@ async function bootstrap() {
       disableErrorMessages: false, // 유효성 검사 오류 메시지 비활성화
     }),
   );
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // swagger 설정
   const swaggerCustomOptions: SwaggerCustomOptions = {
