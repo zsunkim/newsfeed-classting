@@ -43,8 +43,9 @@ export class SchoolService {
    * 학교 페이지 구독하기
    * @param studentId 학생 아이디
    * @param schoolId 구독할 학교 아이디
+   * @return Promise<boolean>
    */
-  async subscribeSchoolPage(studentId: string, schoolId: number) {
+  async subscribeSchoolPage(studentId: string, schoolId: number): Promise<boolean> {
     const subSchoolData = {
       id: studentId,
       school_id: schoolId,
@@ -57,7 +58,8 @@ export class SchoolService {
     }
 
     try {
-      return await this.studentRepository.insert(subSchoolData);
+      await this.studentRepository.insert(subSchoolData);
+      return true;
     } catch (err) {
       this.logger.log({ level: 'error', message: err });
       throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -68,8 +70,9 @@ export class SchoolService {
    * 학교 페이지 구독 취소하기
    * @param studentId 구독 취소할 학생 아이디
    * @param schoolId 취소당하는 학교 아이디
+   * @return Promise<boolean>
    */
-  async unsubscribeSchoolPage(studentId: string, schoolId: number) {
+  async unsubscribeSchoolPage(studentId: string, schoolId: number): Promise<boolean> {
     const unsubData = {
       id: studentId,
       school_id: schoolId,
@@ -77,12 +80,13 @@ export class SchoolService {
 
     const checkData = await this.studentRepository.findOneBy(unsubData);
 
-    if (checkData) {
+    if (checkData === null) {
       throw new HttpException('학교 페이지 정보가 없습니다.', HttpStatus.BAD_REQUEST);
     }
 
     try {
-      return await this.studentRepository.delete(unsubData);
+      await this.studentRepository.delete(unsubData);
+      return true;
     } catch (err) {
       this.logger.log({ level: 'error', message: err });
       throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
