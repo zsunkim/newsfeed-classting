@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SchoolRepository } from './repository/school.repository';
 import { SchoolCreateReqDto } from './dtos/req/school.create.req.dto';
 import { SchoolEntity } from './entities/school.entity';
 import { StudentRepository } from './repository/student.repository';
 import { StudentEntity } from './entities/student.entity';
+import { WINSTON_MODULE_PROVIDER, WinstonLogger } from 'nest-winston';
 
 @Injectable()
 export class SchoolService {
   constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
     @InjectRepository(SchoolRepository)
     private schoolRepository: SchoolRepository,
     @InjectRepository(StudentRepository)
@@ -21,11 +23,18 @@ export class SchoolService {
    * @return Promise<SchoolEntity>
    */
   async createSchool(schoolCreateReqDto: SchoolCreateReqDto): Promise<SchoolEntity> {
+    const checkData = await this.schoolRepository.findOneBy(schoolCreateReqDto);
+
+    if (checkData) {
+      throw new HttpException('이미 존재하는 학교입니다.', HttpStatus.BAD_REQUEST);
+    }
+
     try {
       const school = await this.schoolRepository.insert(schoolCreateReqDto);
 
       return this.schoolRepository.findOneByOrFail({ id: school.raw.id });
     } catch (err) {
+      this.logger.log({ level: 'error', message: err });
       throw err;
     }
   }
@@ -41,10 +50,17 @@ export class SchoolService {
       school_id: schoolId,
     };
 
+    const checkData = await this.studentRepository.findOneBy(subSchoolData);
+
+    if (checkData) {
+      throw new HttpException('이미 구독중입니다.', HttpStatus.BAD_REQUEST);
+    }
+
     try {
       return await this.studentRepository.insert(subSchoolData);
     } catch (err) {
-      throw err;
+      this.logger.log({ level: 'error', message: err });
+      throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -59,10 +75,17 @@ export class SchoolService {
       school_id: schoolId,
     };
 
+    const checkData = await this.studentRepository.findOneBy(unsubData);
+
+    if (checkData) {
+      throw new HttpException('학교 페이지 정보가 없습니다.', HttpStatus.BAD_REQUEST);
+    }
+
     try {
       return await this.studentRepository.delete(unsubData);
     } catch (err) {
-      throw err;
+      this.logger.log({ level: 'error', message: err });
+      throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -75,7 +98,8 @@ export class SchoolService {
     try {
       return await this.studentRepository.findBy({ id: studentId });
     } catch (err) {
-      throw err;
+      this.logger.log({ level: 'error', message: err });
+      throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

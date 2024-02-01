@@ -4,7 +4,7 @@ import { SchoolEntity } from './school.entity';
 
 @Entity('student')
 export class StudentEntity extends CommonEntity {
-  @PrimaryColumn({ name: 'id', type: 'varchar', comment: '학생 아이디' })
+  @PrimaryColumn({ name: 'id', type: 'varchar', length: 10, comment: '학생 아이디' })
   id: string;
 
   @PrimaryColumn({ name: 'school_id', type: 'int', comment: '학교 아이디' })
