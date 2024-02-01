@@ -32,6 +32,25 @@ $ npm install -g @nestjs/cli
   $ npm run start:prod
   ```
 
+## Test Coverage
+
+- coverage 확인
+
+```bash
+$ npm run test:cov
+```
+
+- unit test 확인
+
+```bash
+$ npm run test
+```
+
 ## 데이터베이스 ERD
 
 <img width="410" alt="DB_ERD" src="https://github.com/zsunkim/newsfeed-classting/assets/66250890/e21c75d1-3116-48b0-b59c-1136fe515d63">
+
+## TODO
+
+- Unit Test Code 작성
+- 통합 Test Code 작성
