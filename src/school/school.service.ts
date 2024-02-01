@@ -32,7 +32,7 @@ export class SchoolService {
     try {
       const school = await this.schoolRepository.insert(schoolCreateReqDto);
 
-      return this.schoolRepository.findOneByOrFail({ id: school.raw.id });
+      return this.schoolRepository.findOneByOrFail({ id: school.identifiers[0].id });
     } catch (err) {
       this.logger.log({ level: 'error', message: err });
       throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
