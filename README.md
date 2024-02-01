@@ -34,4 +34,4 @@ $ npm install -g @nestjs/cli
 
 ## 데이터베이스 ERD
 
-
+<img width="410" alt="DB_ERD" src="https://github.com/zsunkim/newsfeed-classting/assets/66250890/e21c75d1-3116-48b0-b59c-1136fe515d63">
