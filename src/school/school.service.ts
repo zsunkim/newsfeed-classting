@@ -35,7 +35,7 @@ export class SchoolService {
       return this.schoolRepository.findOneByOrFail({ id: school.raw.id });
     } catch (err) {
       this.logger.log({ level: 'error', message: err });
-      throw err;
+      throw new HttpException('죄송합니다. 다시 시도해주세요.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
